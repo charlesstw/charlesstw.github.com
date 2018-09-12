@@ -49,7 +49,7 @@
   	<div id="MADdpzone" style="position:relative; top:0%; left:0%; width:100%; height:auto;"></div>
     <div style="position:relative; width:100%; height:auto; top:0%; left:0%;">
      	<!-- <a href="../index.html"> -->
-	    <img src="../image/go-back-button.png" style="position:relative; width:40%; height:auto; left:30%; margin-top:20px; margin-bottom:20px; z-index:10; background-color:blue;" onclick="goBack();" />
+	    <img src="../image/go-back-button.png" style="position:relative; width:50px; height:50px; left:50px; margin-top:20px; margin-bottom:20px; z-index:10; background-color:blue;" onclick="goBack();" />
 	    <!-- </a>  -->
 	    <div style="position:absolute; width:100%; height:8%; left:0%; top:50%; background-color:black; transform: translateY(-50%);"></div>
     </div>
@@ -60,37 +60,77 @@
     
     <script type="text/javascript" language="javascript">
     function goBack(){
+      console.log("click!!");
     	//document.location.href = "../index.html";
-      charlesLoadAd('tBpQ1533092104174Q', '1', 'MADdpzone', true, 0, callback);
+      //charlesLoadAd('tBpQ1533092104174Q', '1', 'MADdpzone', true, 0, callback);
+      InitiateSpeedDetection();
     }
-      // var adId;s
-      // var IDRandom = Math.floor((Math.random() * 2) + 1);
-      // console.log(IDRandom);
+var imageAddr = "https://portals1.tamedia.com.tw/Charles_TestFolder/JPG8mb.jpg"; 
+var downloadSize = 8075834; //bytes
 
-      // if(IDRandom == 2){
-      //   adId = 'y1533799655087Y';
-      //   // console.log("我是2");
-      //   // console.log(adId);
-      // }else{
-      //   adId = 'tBpQ1533092104174Q';
-      //   // console.log("我是1");
-      //   // console.log(adId);
-      // }
-
-      adLoad2('tBpQ1533092104174Q', '1', 'MADdpzone', true, 0, callback);
-      // adLoad2(adId, '1', 'MADdpzone', true, 0, callback);
-
-      function callback(status){
-        console.log("callback status : " + status);
-        if(status != "00"){
-        	var MADdpzone = document.getElementById("MADdpzone");
-        	var noADIMG = document.createElement("IMG");
-        	noADIMG.src = "../image/SORRYNOAD_640x100.png";
-        	noADIMG.style.width = "100%";
-        	noADIMG.style.height = "auto";
-        	MADdpzone.appendChild(noADIMG);
+function ShowProgressMessage(msg) {
+    if (console) {
+        if (typeof msg == "string") {
+            console.log(msg);
+        } else {
+            for (var i = 0; i < msg.length; i++) {
+                console.log(msg[i]);
+            }
         }
-      }
+    }
+    
+    var oProgress = document.getElementById("progress");
+    if (oProgress) {
+        var actualHTML = (typeof msg == "string") ? msg : msg.join("<br />");
+        oProgress.innerHTML = actualHTML;
+    }
+}
+
+function InitiateSpeedDetection() {
+    ShowProgressMessage("Loading the image, please wait...");
+    window.setTimeout(MeasureConnectionSpeed, 1);
+};    
+
+if (window.addEventListener) {
+    window.addEventListener('load', InitiateSpeedDetection, false);
+} else if (window.attachEvent) {
+    window.attachEvent('onload', InitiateSpeedDetection);
+}
+
+function MeasureConnectionSpeed() {
+    var startTime, endTime;
+    var download = new Image();
+    download.onload = function () {
+        endTime = (new Date()).getTime();
+        showResults();
+    }
+    
+    download.onerror = function (err, msg) {
+        ShowProgressMessage("Invalid image, or error downloading");
+    }
+    
+    startTime = (new Date()).getTime();
+    var cacheBuster = "?nnn=" + startTime;
+    download.src = imageAddr + cacheBuster;
+    
+    function showResults() {
+        var duration = (endTime - startTime) / 1000;
+        var bitsLoaded = downloadSize * 8;
+        var speedBps = (bitsLoaded / duration).toFixed(2);
+        var speed = (downloadSize/duration)/1024.toFixed(2);
+        var speedKbps = (speedBps / 1024).toFixed(2);
+        var speedMbps = (speedKbps / 1024).toFixed(2);
+        ShowProgressMessage([
+            "Your connection speed is:", 
+            speedBps + " bps", 
+            speedKbps + " kbps", 
+            speedMbps + " Mbps"
+            speed+" kb/s"
+
+
+        ]);
+    }
+  }
     </script>
   </body>
 </html>

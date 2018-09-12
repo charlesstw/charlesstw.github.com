@@ -69,10 +69,11 @@ var imageAddr = "https://portals1.tamedia.com.tw/Charles_TestFolder/JPG8mb.jpg";
 var downloadSize = 8075834; //bytes
 
 function ShowProgressMessage(msg) {
+  window.alert(msg);
     if (console) {
         if (typeof msg == "string") {
             console.log(msg);
-            alert(msg);
+            window.alert(msg);
         } else {
             for (var i = 0; i < msg.length; i++) {
                 console.log(msg[i]);
@@ -118,16 +119,15 @@ function MeasureConnectionSpeed() {
         var duration = (endTime - startTime) / 1000;
         var bitsLoaded = downloadSize * 8;
         var speedBps = (bitsLoaded / duration).toFixed(2);
-        var speed = (downloadSize/duration)/1024.toFixed(2);
+        var speed = (downloadSize / duration/1024).toFixed(2);
         var speedKbps = (speedBps / 1024).toFixed(2);
         var speedMbps = (speedKbps / 1024).toFixed(2);
         ShowProgressMessage([
             "Your connection speed is:", 
-            speedBps + " bps", 
-            speedKbps + " kbps", 
-            speedMbps + " Mbps"
+            // speedBps + " bps", 
+            // speedKbps + " kbps", 
+            // speedMbps + " Mbps",
             speed+" kb/s"
-
 
         ]);
     }

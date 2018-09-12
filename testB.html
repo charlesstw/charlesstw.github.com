@@ -55,8 +55,9 @@
 	    <!-- </a>  -->
 	    <div style="position:absolute; width:100%; height:8%; left:0%; top:50%; background-color:black; transform: translateY(-50%);"></div>
     </div>
-    <div id = "SpeedResult">Speed:</div>
-    <div id = "Donwlink">Speed:</div>
+    <div id = "Donwlink">Downlink:</div>
+    <h2 id="progress">JavaScript is turned off, or your browser is realllllly slow</h2>
+
     <!-- <div class="info"><b>版位名稱<br><span style="color:#FF5511;">TAM_Banner640x100_MW_分潤</span></b></div>
     <div class="info"><b>版  位 ID<br><span style="color:#FF5511;">tBpQ1533092104174Q</span></b></div> -->
     
@@ -65,9 +66,12 @@
     <script type="text/javascript" language="javascript">
       var imageAddr = "https://portals1.tamedia.com.tw/Charles_TestFolder/JPG8mb.jpg"; 
       var downloadSize = 8075834; //bytes
-      var downspeed = navigator.connection.downlink;  
-      document.getElementById("Donwlink").innerHTML = "downLink="+downspeed*125+"kb/s";
-    console.log("downLink="+downspeed);            
+      function showDownLink () {
+        var downspeed = navigator.connection.downlink;  
+        document.getElementById("Donwlink").innerHTML = "downLink="+downspeed*125+"kb/s";
+        console.log("downLink="+downspeed);            
+      }
+      showDownLink();
     function goBack(){
       console.log("click!!");
     	//document.location.href = "../index.html";
@@ -75,6 +79,7 @@
       imageAddr = "https://portals1.tamedia.com.tw/Charles_TestFolder/JPG8mb.jpg"; 
       downloadSize = 8075834; //bytes
       InitiateSpeedDetection();
+      showDownLink();
     }
 
 
@@ -82,12 +87,13 @@ function testSpeed() {
     imageAddr = "https://portals1.tamedia.com.tw/Charles_TestFolder/JPG3kb.jpg"; 
     downloadSize = 2594; //bytes
   InitiateSpeedDetection();
+  showDownLink();
 }
 
 function ShowProgressMessage(msg) {
   //window.alert(msg);              
   
-  document.getElementById("SpeedResult").innerHTML = msg;
+  //document.getElementById("SpeedResult").innerHTML = msg;
     if (console) {
         if (typeof msg == "string") {
             console.log(msg);            
@@ -145,7 +151,7 @@ function MeasureConnectionSpeed() {
             // speedKbps + " kbps", 
             // speedMbps + " Mbps",
             speed+" kb/s",
-            "Download time"+duration+" s"
+            "Download time:"+duration+" s"
 
         ]);
     }

@@ -15,12 +15,14 @@
     <![endif]-->
     <script>
       //setTimeout(function() { window.location.href = "https://www.google.com.tw"; }, 5000);
-      try {
-      window.location.href = "ioslog://test";
-    } catch (e) {
-      // console.log("***[error] exception: " + e);
-      console.log("Can't call passElementOffset function.");
-    }
+      function callNativeLog() {
+        try {
+          window.location.href = "ioslog://test";
+        } catch (e) {
+          // console.log("***[error] exception: " + e);
+          console.log("Can't call passElementOffset function.");
+        }  
+      }      
     </script>
     
   </head>

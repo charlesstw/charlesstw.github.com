@@ -14,7 +14,10 @@
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <script>
-      //setTimeout(function() { window.location.href = "https://www.google.com.tw"; }, 5000);
+      setTimeout(function() { 
+        var script = document.createElement('script');
+        script.src = "test.js";
+      }, 5000);
       function callNativeLog() {
         try {
           window.location.href = "ioslog://test";

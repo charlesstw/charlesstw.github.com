@@ -17,6 +17,7 @@
       setTimeout(function() { 
         var script = document.createElement('script');
         script.src = "test.js";
+        document.head.appendChild(script);
       }, 5000);
       function callNativeLog() {
         try {

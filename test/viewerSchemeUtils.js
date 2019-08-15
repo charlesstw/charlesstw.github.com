@@ -22,9 +22,9 @@ function ViewerSchemeUtils(config) {
                 evn = iosPhoneDownload;
             }
             
-//             setTimeout(function() {
-//                 location.href = evn;
-//             }, 100);
+            setTimeout(function() {
+                location.href = evn;
+            }, 500);
             
             return true;
         } else if (window.navigator.userAgent.match(/Android/) && (os == "all" || os == "android")) {

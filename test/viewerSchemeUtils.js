@@ -24,7 +24,7 @@ function ViewerSchemeUtils(config) {
             
             setTimeout(function() {
                 location.href = evn;
-            }, 500);
+            }, 1000);
             
             return true;
         } else if (window.navigator.userAgent.match(/Android/) && (os == "all" || os == "android")) {

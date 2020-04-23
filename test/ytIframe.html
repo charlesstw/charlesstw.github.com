@@ -20,7 +20,14 @@
           height: '390',
           width: '640',
           videoId: 'sPyAQQklc1s',
-          playsinline: '1',
+          playerVars: {
+                    autoplay: 1,
+                    controls: 0,
+                    showinfo: 0,
+                    autohide: 1,
+                    modestbranding: 1,
+                    playsinline: 1,
+                    vq: 'hd1080'},
           events: {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange

@@ -1,5 +1,27 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <style>
+      .responsive-container {
+	      position: relative;
+      	padding-bottom: 53.25%;
+      	padding-top: 30px;
+      	height: 0;
+    	  overflow: hidden;
+      }
+      .responsive-container,
+    	.responsive-container iframe {
+      	max-width: 1280px;
+      	max-height: 720px;
+      }
+      .responsive-container iframe {
+      	position: absolute;
+      	top: 0; left: 0;
+      	width: 100%;
+      	height: 100%;
+      }
+    </style>
+  </head>
   <body>
     <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
     <div id="player"></div>
@@ -55,8 +77,9 @@
         player.stopVideo();
       }
     </script>
-    <iframe id="ytplayer" type="text/html" width="640" height="360"
-  src="https://www.youtube.com/embed/czNMh9kVhIE?autoplay=1&playsinline=1&control=1&vq=large"
-  frameborder="0"></iframe>
+    
+    <div class="responsive-container">
+  	  <iframe width="1280" height="720" src="//youtube.com/embed/HiN6Ag5-DrU?VQ=HD720" frameborder="0" allowfullscreen></iframe>
+    </div>    
   </body>
 </html>

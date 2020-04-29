@@ -54,6 +54,7 @@
           events: {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange
+	    'onPlaybackQualityChange' : onPlaybackQualityChange
           }
         });
       }
@@ -73,6 +74,11 @@
           done = true;
         }
       }
+      
+      function onPlaybackQualityChange(evnet) {
+	 console.log("current quality" + event);
+      }
+
       function stopVideo() {
         player.stopVideo();
       }

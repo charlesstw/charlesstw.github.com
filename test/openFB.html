@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="robots" content="noindex"> 
+</head>
+<body>
+<p></p>
+
+
+<script type="text/javascript">
+window.onload = function() {
+  if (console) { console.log('onload ......'); }
+  var webUrl = "https://www.facebook.com";
+  var webUrlForApp = "https://www.facebook.com";
+  var appUrl = "fb://";
+
+  var urlString = window.location.href.replace(/.*\/\/[^\/]*/,'');
+  if (console) { console.log("urlString: " + urlString); }
+  
+  var paramString = urlString.split('?')[1];
+  if (console) { console.log("paramString: " + paramString); }
+  var paramString_encodeURI = encodeURIComponent(paramString);
+  if (console) { console.log("paramString_encodeURI: " + paramString_encodeURI); }
+
+  if (paramString != null) {
+    appUrl = appUrl + '%3F' + paramString_encodeURI;
+    webUrl = webUrl + '?' + paramString;
+  }
+  if (console) { console.log("webUrl: " + webUrl); }
+  if (console) { console.log("appUrl: " + appUrl); }
+
+  openApp(appUrl, webUrl);
+};
+
+
+function openApp(appUrl, webUrl) {
+  // 避免啟動失敗的計時器
+  if (console) { console.log('set Timer of webUrl ......'); }
+  var before = new Date().valueOf();
+  if (console) { console.log('before = ' + before); }
+  var timer = setTimeout(function() {
+    if (console) { console.log('webUrl ......'); }
+  var after = new Date().valueOf();
+  if (console) { console.log('after = ' + after); }
+  if (console) { console.log('after - before = ' + after - before); }
+  if(after - before > 5000){ window.opener=null;window.open('','_self');window.close(); }
+    if (webUrl) {
+      window.location.href = webUrl;
+    }
+  }, 1000);
+
+  // 判斷瀏覽器來區分啟動方式
+  var ifr;
+  if (navigator.userAgent.match(/Chrome/i)) {
+    // window.clearTimeout(timer);
+  if (console) { console.log('/Chrome/i ......'); }
+    window.location.replace(appUrl);
+  } else if (navigator.userAgent.match(/(Safari)/i)) {
+    if (navigator.userAgent.match(/(iPhone|iPad|iPod)/i)) {
+      // window.clearTimeout(timer);
+    if (console) { console.log('/(Safari)/i    /(iPhone|iPad|iPod)/i ......'); }
+      window.location.replace(appUrl);
+    } else if (navigator.userAgent.match(/Mobile/i)) {
+      // window.clearTimeout(timer);
+    if (console) { console.log('/(Safari)/i    /Mobile/i ......'); }
+      window.location.replace(appUrl);
+    } else {
+    if (console) { console.log('/(Safari)/i    Others ......'); }
+    if (console) { console.log('create iFrame ......'); }
+      ifr = document.createElement('iframe');
+
+      ifr.src = appUrl;
+      ifr.style.display = 'none';
+      document.body.appendChild(ifr);
+    }
+  } else {
+    if (console) { console.log('Others ......'); }
+    ifr = document.createElement('iframe');
+
+    ifr.src = appUrl;
+    ifr.style.display = 'none';
+    document.body.appendChild(ifr);
+  }
+
+  // 用 onblur 來確認有沒有多跳一個是否啟動 APP 的確認視窗
+  window.onblur = function() {
+    if (console) { console.log('onblur ......'); }
+    window.clearTimeout(timer);
+    if (ifr) {
+    if (console) { console.log('remove iFrame ......'); }
+      ifr.remove();
+    }
+  window.opener=null;window.open('','_self');window.close();
+  };
+
+  if (console) { console.log('Set Timer of remove iFrame ......'); }
+  setTimeout(function() {
+    if (ifr) {
+    if (console) { console.log('remove iFrame ......'); }
+      ifr.remove();
+    }
+  }, 10000);
+}
+
+</script>
+</body>
+</html>
+
+

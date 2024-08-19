@@ -3,15 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>檢查 Header 參數並隱藏元素</title>
+    <title>檢查 UserAgent 並隱藏元素</title>
 </head>
 <body>
-    <h1>檢查 Header 參數並隱藏元素</h1>
-    <div id="hiddenDiv">這個 div 可能會被隱藏</div>
-
-    <script>
-        // 發送請求以檢查 header
-
+    <h1>檢查 UserAgent 並隱藏元素</h1>
+    <div id="hiddenDiv">這個 div 可能會被隱藏</div>    
+    <script>                
         let userAgent = navigator.userAgent;
         if (userAgent == "app") {
             document.getElementById('hiddenDiv').style.display = 'none';
@@ -21,4 +18,4 @@
         };
     </script>
 </body>
-</html>
+</html> 

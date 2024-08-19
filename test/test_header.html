@@ -26,9 +26,12 @@
                 // 獲取 'test' header 的值
                 const testHeader = response.headers.get('test');
                 
-                if (!testHeader) {
-                    // 如果 'test' header 存在，隱藏特定的 div
+                if (testHeader) {
+                    // 如果 'test' header 不存在，隱藏特定的 div
                     document.getElementById('hiddenDiv').style.display = 'none';
+                    console.log('test header 存在，div 已被隱藏');
+                } else {
+                    console.log('test header 不存在，div 保持顯示');
                 }
             })
             .catch(error => {

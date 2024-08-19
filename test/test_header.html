@@ -3,40 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>檢查 Header 並隱藏元素</title>
-    <style>
-        #hiddenDiv {
-            width: 200px;
-            height: 100px;
-            background-color: lightblue;
-            text-align: center;
-            line-height: 100px;
-            margin-top: 20px;
-        }
-    </style>
+    <title>檢查 Header 參數並隱藏元素</title>
 </head>
 <body>
-    <h1>檢查 Header 並隱藏元素</h1>
+    <h1>檢查 Header 參數並隱藏元素</h1>
     <div id="hiddenDiv">這個 div 可能會被隱藏</div>
 
     <script>
         // 發送請求以檢查 header
-        fetch(window.location.href)
-            .then(response => {
-                // 獲取 'test' header 的值
-                const testHeader = response.headers.get('test');
-                
-                if (testHeader) {
-                    // 如果 'test' header 不存在，隱藏特定的 div
-                    document.getElementById('hiddenDiv').style.display = 'none';
-                    console.log('test header 存在，div 已被隱藏');
-                } else {
-                    console.log('test header 不存在，div 保持顯示');
-                }
-            })
-            .catch(error => {
-                console.error('發生錯誤:', error);
-            });
+
+        let userAgent = navigator.userAgent;
+        if (userAgent == "app") {
+            document.getElementById('hiddenDiv').style.display = 'none';
+            console.log('user agent = app，div 已被隱藏');
+        } else {
+            console.log('user agent != app，div 不隱藏');        
+        };
     </script>
 </body>
 </html>

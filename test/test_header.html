@@ -7,7 +7,15 @@
 </head>
 <body>
     <h1>檢查 UserAgent 並隱藏元素</h1>
-    <div id="hiddenDiv">這個 div 可能會被隱藏</div>    
+    <div id="hiddenDiv">這個 div 可能會被隱藏</div>   
+    <a id="20240819001" href="https://developer.apple.com" target="_blank"                           
+        <div class="list-text">
+            <!-- ↓標題 -->
+            <h3>這裡是標題</h3>
+            <!-- ↓日期 -->
+            <p>2024/08/19</p>                    
+        </div>
+    </a>
     <script>                
         let userAgent = navigator.userAgent;
         if (userAgent == "app") {

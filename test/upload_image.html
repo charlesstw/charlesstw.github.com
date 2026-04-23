@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拍照與相簿上傳範例</title>
+    <style>
+        /* 簡單的版面美化 */
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            padding: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .upload-btn-wrapper {
+            margin-bottom: 20px;
+        }
+        /* 隱藏預設的醜醜 input，用一個好看的按鈕包裝它（進階技巧） */
+        .custom-file-upload {
+            border: 1px solid #ccc;
+            display: inline-block;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input[type="file"] {
+            display: none; /* 把原本的 input 隱藏 */
+        }
+        /* 預覽區塊的樣式 */
+        .preview-box {
+            border: 2px dashed #bbb;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            overflow: hidden;
+        }
+        .preview-box img {
+            max-width: 100%;
+            max-height: 300px;
+            display: none; /* 預設先隱藏圖片 */
+        }
+        .placeholder-text {
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>上傳您的照片</h2>
+    <p style="color: #666; font-size: 14px;">在手機上點擊，可選擇拍照或從相簿挑選。</p>
+
+    <div class="upload-btn-wrapper">
+        <label class="custom-file-upload">
+            <input type="file" id="photoInput" accept="image/*">
+            📷 點我選擇照片或拍照
+        </label>
+    </div>
+
+    <div class="preview-box" id="previewBox">
+        <span class="placeholder-text" id="placeholderText">照片預覽會顯示在這裡</span>
+        <img id="imagePreview" alt="您的照片預覽">
+    </div>
+
+    <script>
+        // 取得 HTML 元素
+        const photoInput = document.getElementById('photoInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const placeholderText = document.getElementById('placeholderText');
+        const previewBox = document.getElementById('previewBox');
+
+        // 當使用者選好檔案時，會觸發 'change' 事件
+        photoInput.addEventListener('change', function(event) {
+            const file = event.target.files[0]; // 抓取使用者選擇的第一個檔案
+
+            if (file) {
+                // 使用 FileReader 來讀取圖片檔案
+                const reader = new FileReader();
+
+                // 當讀取完成後執行的動作
+                reader.onload = function(e) {
+                    // 將圖片的 src 設定為讀取到的結果
+                    imagePreview.src = e.target.result;
+                    
+                    // 切換顯示狀態：秀出圖片、隱藏提示文字
+                    imagePreview.style.display = 'block';
+                    placeholderText.style.display = 'none';
+                    previewBox.style.border = 'none'; // 隱藏虛線邊框
+                }
+
+                // 將檔案讀取為 Data URL (Base64格式)，這是一張可以顯示在網頁上的字串
+                reader.readAsDataURL(file);
+            } else {
+                // 如果使用者點了取消，恢復預設狀態
+                imagePreview.src = '';
+                imagePreview.style.display = 'none';
+                placeholderText.style.display = 'block';
+                previewBox.style.border = '2px dashed #bbb';
+            }
+        });
+    </script>
+
+</body>
+</html>

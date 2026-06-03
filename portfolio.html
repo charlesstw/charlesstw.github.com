@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charles Wang | Portfolio</title>
+    <style>
+        /* 極簡現代風 核心樣式 */
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+            --accent-teal: #3fb950;
+            --border-color: #21262d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Header 區域 */
+        header {
+            text-align: center;
+            padding: 60px 0 40px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+        }
+
+        .contact-info {
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .contact-info span {
+            margin: 0 10px;
+        }
+
+        /* 區塊通用樣式 */
+        section {
+            padding: 40px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+            position: relative;
+            display: inline-block;
+        }
+
+        section h2::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -4px;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent);
+        }
+
+        /* 技術標籤樣式 */
+        .skills-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .skill-category {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .skill-category h3 {
+            font-size: 1.05rem;
+            margin-bottom: 12px;
+            color: var(--accent);
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background-color: rgba(88, 166, 255, 0.1);
+            color: var(--accent);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(88, 166, 255, 0.2);
+        }
+
+        /* 工作經歷樣式 */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .job-card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .job-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .job-date {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .job-sub-role {
+            font-size: 1.05rem;
+            color: var(--accent-teal);
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .job-card ul {
+            list-style-type: none;
+        }
+
+        .job-card li {
+            position: relative;
+            padding-left: 15px;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+            color: #c9d1d9;
+        }
+
+        .job-card li::before {
+            content: "•";
+            color: var(--accent);
+            position: absolute;
+            left: 0;
+        }
+
+        /* 專案與截圖展示牆樣式 */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .project-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 圖片容器：模擬手機/網頁框架框 */
+        .screenshot-container {
+            width: 100%;
+            height: 200px;
+            background: #090d13;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .screenshot-placeholder {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 20px;
+            border: 1px dashed var(--border-color);
+            border-radius: 4px;
+        }
+
+        /* 當你有真實圖片後，這個樣式會讓圖片完美貼合路徑 */
+        .screenshot-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none; /* 有圖片時請把這行改成 display: block; */
+        }
+
+        .project-body {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .project-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .project-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 600px) {
+            .job-header {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Charles Wang</h1>
+            <p>Senior Engineer | Technical Project Manager | Deputy Manager</p>
+            <div class="contact-info">
+                <span>📱 0936-858197</span>|<span>✉️ tw611@gmail.com</span>
+            </div>
+        </header>
+
+        <section id="skills">
+            <h2>🛠 技術關鍵字 / Keywords</h2>
+            <div class="skills-container">
+                <div class="skill-category">
+                    <h3>iOS / Mobile</h3>
+                    <div class="tags">
+                        <span class="tag">iOS</span><span class="tag">Swift</span><span class="tag">Objective-C</span>
+                        <span class="tag">SwiftUI</span><span class="tag">MVVM</span><span class="tag">SDK</span>
+                        <span class="tag">Core Data</span><span class="tag">ePub</span><span class="tag">Coordinator Pattern</span>
+                    </div>
+                </div>
+                <div class="skill-category">
+                    <h3>Management & AI</h3>
+                    <div class="tags">
+                        <span class="tag">TPM</span><span class="tag">Team Leader</span><span class="tag">API Spec</span>
+                        <span class="tag">RAG</span><span class="tag">MCP</span><span class="tag">BERT fine-tuning</span>
+                    </div>
+                </div>
+                <div class="skill-category">
+                    <h3>DevOps & Standards</h3>
+                    <div class="tags">
+                        <span class="tag">Jenkins</span><span class="tag">CI/CD</span><span class="tag">Fastlane</span>
+                        <span class="tag">XCTest</span><span class="tag">Xium</span><span class="tag">MRAID / VAST</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio">
+            <h2>📱 相關專案成果 / Portfolio</h2>
+            <div class="projects-grid">
+
+                <div class="project-card">
+                    <div class="screenshot-container">
+                        <img class="screenshot-img" src="images/mymoji_screenshot.png" alt="MyMoji App Screenshot">
+                        <div class="screenshot-placeholder">
+                            📸 預留 [MyMoji 3D化身/網頁版介面] 截圖位置<br>
+                            <small>建議尺寸: 400x250 或 手機直式路徑</small>
+                        </div>
+                    </div>
+                    <div class="project-body">
+                        <div class="project-name">MyMoji 專案 (App & Server 端)</div>
+                        <div class="project-desc">整合 AR 技術與核心 Server 端技術。2025/10 起負責時程與規格管控，並協助開發網頁版（Web）部分功能、定義 API Spec。</div>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="screenshot-container">
+                        <img class="screenshot-img" src="images/smarterhome_screenshot.png" alt="SmarterHome Screenshot">
+                        <div class="screenshot-placeholder">
+                            📸 預留 [SmarterHome 智慧家庭控制] 截圖位置<br>
+                            <small>建議比例: 16:9 畫面</small>
+                        </div>
+                    </div>
+                    <div class="project-body">
+                        <div class="project-name">SmarterHome 專案</div>
+                        <div class="project-desc">主導智慧家庭專案之技術規格（Spec）討論與制定，全面負責專案整體進度追蹤與架構規劃。</div>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="screenshot-container">
+                        <img class="screenshot-img" src="images/mybook_screenshot.png" alt="MyBook App Screenshot">
+                        <div class="screenshot-placeholder">
+                            📸 預留 [MyBook 電子書閱讀/書架] 截圖位置<br>
+                            <small>建議放入 iOS 閱讀器畫面截圖</small>
+                        </div>
+                    </div>
+                    <div class="project-body">
+                        <div class="project-name">MyBook 專案</div>
+                        <div class="project-desc">深度整合 Core Data、ePub 電子書檔案格式解析與 UIWebView 渲染組件進行日常高併發維護與核心功能開發。</div>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="screenshot-container">
+                        <img class="screenshot-img" src="images/myair_screenshot.png" alt="myAir App Screenshot">
+                        <div class="screenshot-placeholder">
+                            📸 預留 [myAir 介面或功能畫面] 截圖位置<br>
+                            <small>適合放上手機版 UI 設計截圖</small>
+                        </div>
+                    </div>
+                    <div class="project-body">
+                        <div class="project-name">myAir 專案</div>
+                        <div class="project-desc">全面導入重構架構設計 Pattern（Coordinator Pattern），優化多層級 App 導頁邏輯，提升整體可維護性。</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="experience">
+            <h2>💼 工作經歷 / Experience</h2>
+            <div class="timeline">
+
+                <div class="job-card">
+                    <div class="job-header">
+                        <span class="job-title">台灣大哥大 (TWM)</span>
+                        <span class="job-date">2020/01 ~ 現在</span>
+                    </div>
+
+                    <div class="job-sub-role">Server 端副理 (Team Leader / TPM) | 2025/10 ~ 現在</div>
+                    <ul>
+                        <li>負責團隊 lead、專案進度追蹤與規劃。跨團隊協調 UIUX、QA、Momo 等部門，並對接 Bridge Alliance 國際合作。</li>
+                        <li>主導 SmarterHome 專案之技術規格（Spec）討論與制定，負責專案進度追蹤與規劃。</li>
+                        <li>負責 MyMoji 專案（包含 App 與 Server 端技術），整合 AR 技術並協助開發網頁版（Web）部分功能、定義 API Spec。</li>
+                    </ul>
+
+                    <div class="job-sub-role">iOS Senior Engineer / TPM | 2020/01 ~ 2025/10</div>
+                    <ul>
+                        <li>MyBook 專案：整合 Core Data、ePub 與 UIWebView 進行開發與維護。</li>
+                        <li>myAir 專案：導入 Coordinator Pattern 優化 App 架構。</li>
+                        <li>SDK 與網路安全：負責 TWMID SDK 開發，並經手 VPN、Network Extension 與 IAP 相關功能。</li>
+                        <li>AI 技術應用：導入 RAG、MCP、BERT fine-tuning，成立 CoE 並處理團隊內的 Lint issue。</li>
+                        <li>DevOps 與自動化測試：整合 Jenkins、CI/CD 流程，撰寫 Fastlane 腳本、XCTest 單元測試與 Xium 自動化測試。</li>
+                    </ul>
+                </div>
+
+                <div class="job-card">
+                    <div class="job-header">
+                        <span class="job-title">TAMedia</span>
+                        <span class="job-date">2016/11 ~ 2019/12</span>
+                    </div>
+                    <ul>
+                        <li>負責行動廣告 SDK 開發與維護。</li>
+                        <li>支援 MRAID / VAST / OMSDK 國際廣告標準協定。</li>
+                        <li>負責 iBeacon Demo 應用開發。</li>
+                        <li>負責 M+ CallKit 與 Linphone 網路電話通訊功能開發。</li>
+                    </ul>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="certifications">
+            <h2>🎓 語言與其他 / Certifications</h2>
+            <div class="tags" style="margin-top: 15px;">
+                <span class="tag" style="font-size: 1rem; padding: 6px 12px;">TOEIC: 710 分</span>
+                <span class="tag" style="font-size: 1rem; padding: 6px 12px;">OOP (Object-Oriented Programming)</span>
+            </div>
+        </section>
+
+        <footer>
+            <p>© 2026 Charles Wang. Built for Modern Web & Mobile Architecture.</p>
+        </footer>
+    </div>
+
+</body>
+</html>

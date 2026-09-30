@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AppFunc 測試台 v1.4</title>
+<style>
+  :root{
+    --paper:#e9edf1; --surface:#fff; --ink:#16202b; --ink-soft:#5c6b7a;
+    --line:#ccd6de; --signal:#00707e; --signal-deep:#004f59;
+    --ok:#12744a; --fail:#b03a2e; --warn:#8a6100;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);
+    font-size:15px;line-height:1.6;-webkit-text-size-adjust:100%}
+  .wrap{max-width:720px;margin:0 auto;padding:16px 16px 40px}
+
+  .status{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--signal);
+    border-radius:4px;padding:16px;margin-bottom:14px}
+  .status h1{font-size:13px;font-weight:600;color:var(--ink-soft);margin:0 0 10px}
+  .verdict{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .verdict b{font-size:28px;font-weight:700;letter-spacing:-.01em;line-height:1.15;color:var(--fail)}
+  .verdict b.on{color:var(--signal)}
+  .verdict .via{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+
+  table.matrix{width:100%;border-collapse:collapse;margin-top:14px;font-size:12.5px}
+  table.matrix th{text-align:left;font-weight:600;color:var(--ink-soft);font-size:11.5px;
+    padding:6px 8px;border-bottom:1px solid var(--line)}
+  table.matrix td{padding:7px 8px;border-bottom:1px solid #e7edf1;font-family:var(--mono)}
+  table.matrix tr:last-child td{border-bottom:none}
+  .yes{color:var(--ok);font-weight:700}
+  .no{color:var(--fail);font-weight:700}
+  .tag{font-family:var(--sans);font-size:11px;padding:1px 6px;border-radius:2px;
+    background:#e4eef0;color:var(--signal-deep)}
+  .tag.ff{background:#f0edE4;color:var(--warn)}
+
+  .facts{margin:14px 0 0;padding:12px 0 0;border-top:1px solid var(--line);
+    display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:12.5px}
+  .facts dt{color:var(--ink-soft)}
+  .facts dd{margin:0;font-family:var(--mono);word-break:break-all}
+  .modebar{display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:12px;
+    border-top:1px solid var(--line);font-size:13px}
+  .modebar label{display:flex;align-items:center;gap:7px;cursor:pointer}
+  .modebar input{width:16px;height:16px;accent-color:var(--signal)}
+  .modebar span{color:var(--ink-soft)}
+
+  section{background:var(--surface);border:1px solid var(--line);border-radius:4px;
+    padding:16px;margin-bottom:12px}
+  section>h2{margin:0 0 2px;font-size:15.5px;font-weight:600;font-family:var(--mono);letter-spacing:-.02em}
+  .kind{font-family:var(--sans);font-size:11px;font-weight:500;padding:1px 7px;border-radius:2px;
+    vertical-align:2px;margin-left:7px}
+  .kind.cb{background:#dceff0;color:var(--signal-deep)}
+  .kind.ff{background:#f5eedd;color:var(--warn)}
+  section>p.why{margin:6px 0 14px;font-size:13px;color:var(--ink-soft)}
+
+  .field{margin-bottom:10px}
+  .field label{display:block;font-size:12.5px;color:var(--ink-soft);margin-bottom:4px}
+  input[type=text],textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:3px;
+    background:#fbfcfd;color:var(--ink);font-family:var(--mono);font-size:13px;line-height:1.5}
+  textarea{resize:vertical;min-height:64px}
+  input:focus,textarea:focus{outline:2px solid var(--signal);outline-offset:1px;border-color:var(--signal)}
+
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+  button{font-family:inherit;font-size:14px;cursor:pointer}
+  .fire{background:var(--signal);color:#fff;border:none;border-radius:3px;padding:11px 20px;
+    font-weight:600;transition:background .12s ease}
+  .fire:active{background:var(--signal-deep)}
+  .fire:disabled{background:#9db3b8;cursor:default}
+  .fire.danger{background:var(--fail)}
+  .preset{background:transparent;border:1px solid var(--line);border-radius:3px;padding:6px 11px;
+    font-size:12.5px;color:var(--ink-soft);font-family:var(--mono)}
+  .preset:active{border-color:var(--signal);color:var(--signal)}
+  .verify{border:1px solid var(--line);background:#fff;border-radius:3px;padding:6px 11px;font-size:12.5px}
+  .verify.y{color:var(--ok);border-color:#b9d8c8}
+  .verify.n{color:var(--fail);border-color:#e3c0bb}
+  button:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+
+  .note{margin-top:12px;padding:9px 11px;border-left:3px solid var(--warn);background:#fdf8ec;
+    font-size:12.5px;color:#5a4a24;border-radius:0 3px 3px 0}
+  .note b{color:#4a3c18}
+  .note.hard{border-left-color:var(--fail);background:#fcf0ee;color:#6b2f26}
+
+  video{width:100%;border-radius:3px;background:#000;display:block}
+  .pick{display:block;border:1px dashed var(--line);border-radius:3px;padding:14px 16px;
+    text-align:center;color:var(--ink-soft);font-size:13.5px;cursor:pointer;background:#fbfcfd}
+  .pick input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+  #pickResult{margin-top:10px;display:none}
+  #pickResult img{max-width:120px;border-radius:3px;display:block;margin-bottom:6px}
+  #pickResult p{margin:0;font-family:var(--mono);font-size:12px;word-break:break-all}
+
+  #pendingList{border:1px solid var(--line);border-radius:3px;background:#fbfcfd;padding:4px;min-height:44px}
+  #pendingList.pending-empty{display:flex;align-items:center;justify-content:center;
+    color:var(--ink-soft);font-size:13px}
+  .pending-item{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;padding:7px 8px;border-radius:2px;
+    background:#eef6f6;margin:3px;font-family:var(--mono);font-size:11.5px}
+  .pending-item b{font-size:12.5px;color:var(--signal-deep)}
+  .pending-item span{color:var(--ink-soft);word-break:break-all}
+  .pending-item em{font-style:normal;color:var(--warn);margin-left:auto;white-space:nowrap}
+
+  .loghead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  #log{margin-top:12px;max-height:340px;overflow:auto;border:1px solid var(--line);
+    border-radius:3px;background:#fbfcfd}
+  .entry{padding:9px 11px;border-bottom:1px solid var(--line);border-left:3px solid var(--line)}
+  .entry:last-child{border-bottom:none}
+  .entry.out{border-left-color:var(--signal)}
+  .entry.ok{border-left-color:var(--ok)}
+  .entry.err{border-left-color:var(--fail)}
+  .entry.sys{border-left-color:var(--ink-soft)}
+  .entry.human{border-left-color:var(--warn);background:#fefcf6}
+  .entry .head{display:flex;gap:8px;align-items:baseline;font-size:12px;
+    font-family:var(--mono);color:var(--ink-soft)}
+  .entry .head strong{color:var(--ink)}
+  .entry.ok .head strong{color:var(--ok)}
+  .entry.err .head strong{color:var(--fail)}
+  .entry pre{margin:5px 0 0;font-family:var(--mono);font-size:11.5px;line-height:1.55;
+    white-space:pre-wrap;word-break:break-all;color:#2b3a48}
+  .empty{padding:22px 12px;text-align:center;color:var(--ink-soft);font-size:13px}
+  footer{font-size:12px;color:var(--ink-soft);text-align:center;padding:6px 0 0}
+
+  #toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);max-width:88%;
+    background:#16202b;color:#fff;padding:11px 16px;border-radius:4px;font-size:13.5px;
+    box-shadow:0 4px 18px rgba(0,0,0,.25);display:none;z-index:50}
+  #toast b{display:block;font-size:11px;opacity:.65;font-weight:500;margin-bottom:2px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="status">
+    <h1>AppFunc 介面狀態</h1>
+    <div class="verdict">
+      <b id="verdict">偵測中</b>
+      <span class="via" id="via"></span>
+    </div>
+
+    <table class="matrix">
+      <thead><tr><th>方法</th><th>存在</th><th>類型</th></tr></thead>
+      <tbody>
+        <tr><td>openExternalLink</td><td id="m1">—</td><td><span class="tag ff">無回呼</span></td></tr>
+        <tr><td>downloadFile</td><td id="m2">—</td><td><span class="tag">有回呼</span></td></tr>
+        <tr><td>openEmail</td><td id="m3">—</td><td><span class="tag ff">無回呼</span></td></tr>
+      </tbody>
+    </table>
+
+    <dl class="facts">
+      <dt>頁面 host</dt><dd id="fHost">—</dd>
+      <dt>AppFunc 全部方法</dt><dd id="fAll">—</dd>
+      <dt>UA</dt><dd id="fUA">—</dd>
+    </dl>
+
+    <div class="modebar">
+      <label><input type="checkbox" id="mockChk"> 模擬模式</label>
+      <span>注入假的 AppFunc，在一般瀏覽器驗前端流程</span>
+    </div>
+  </div>
+
+  <section>
+    <h2>openExternalLink<span class="kind ff">無回呼</span></h2>
+    <p class="why">規格 5.2。問題 4、6。呼叫後 web 完全不知道結果 —— 失敗提示是 App 的責任（5.6）。</p>
+    <div class="field">
+      <label for="extUrl">url</label>
+      <input type="text" id="extUrl" value="https://www.taiwanmobile.com/">
+    </div>
+    <div class="row">
+      <button class="preset" data-set="extUrl" data-val="https://www.taiwanmobile.com/">https 正常</button>
+      <button class="preset" data-set="extUrl" data-val="line://ti/p/~mymoji">deep link</button>
+      <button class="preset" data-set="extUrl" data-val="myapp-not-installed://x">找不到 App</button>
+      <button class="preset" data-set="extUrl" data-val="javascript:alert(1)">javascript: 應被擋</button>
+      <button class="preset" data-set="extUrl" data-val="file:///etc/hosts">file: 應被擋</button>
+    </div>
+    <div class="row">
+      <button class="fire" id="fireExt">開啟外部連結</button>
+    </div>
+    <div class="note">
+      <b>人工檢核（5.6）</b><br>
+      「找不到 App」情境下，App 端應出現提示告知無法開啟。<br>
+      「javascript:」「file:」情境下，App 端應<b>靜默忽略、不提示</b>，只記 log。
+      <div class="row">
+        <button class="verify y" data-verify="openExternalLink｜App 有出現提示">App 有跳提示</button>
+        <button class="verify n" data-verify="openExternalLink｜App 完全沒反應">App 沒反應</button>
+        <button class="verify" data-verify="openExternalLink｜已正常開啟外部">已正常開啟</button>
+      </div>
+    </div>
+    <div class="note">開完外站後按裝置返回鍵回 App，確認 WebView 仍停在原本頁面、沒卡在 redirect 頁。</div>
+  </section>
+
+  <section>
+    <h2>downloadFile<span class="kind cb">有回呼</span></h2>
+    <p class="why">規格 5.3。問題 3。本規格唯一有回呼的方法，最後一個參數是 web 產生的 callbackId。提示由 web 負責，App 端<b>不要</b>另外跳 toast。</p>
+    <div class="field">
+      <label for="dlUrl">url（僅允許 https）</label>
+      <input type="text" id="dlUrl" value="https://storage.googleapis.com/gvabox/media/samples/stock.mp4">
+    </div>
+    <div class="field">
+      <label for="dlName">filename</label>
+      <input type="text" id="dlName" value="mymoji_faceswap_test.mp4">
+    </div>
+    <div class="row">
+      <button class="preset" data-set="dlUrl" data-val="http://example.com/a.mp4">http 應回 INVALID_PARAM</button>
+      <button class="preset" data-set="dlUrl" data-val="https://mymoji.com.tw/not-exist.mp4">404 測 DOWNLOAD_FAILED</button>
+    </div>
+    <div class="row">
+      <button class="fire" id="fireDl">下載到相簿</button>
+      <button class="preset" id="fireDl2">同時送兩筆（測 callbackId 配對）</button>
+    </div>
+    <div class="note">
+      首次執行留意相簿權限彈窗。拒絕後<b>再按一次</b>，應收到 PERMISSION_DENIED 而不是無回應 —— 這是 6.4 特別註明的情境：系統不再彈窗時原生仍須回呼。
+    </div>
+  </section>
+
+  <section>
+    <h2>openEmail<span class="kind ff">無回呼</span></h2>
+    <p class="why">規格 5.4。問題 5。web 無從得知使用者是否真的寄出，所以呼叫後<b>不顯示任何成功提示</b>。</p>
+    <div class="field">
+      <label for="mTo">to</label>
+      <input type="text" id="mTo" value="mymoji_support@taiwanmobile.com">
+    </div>
+    <div class="field">
+      <label for="mSub">subject</label>
+      <input type="text" id="mSub" value="MyMoji 意見回饋">
+    </div>
+    <div class="field">
+      <label for="mBody">body</label>
+      <textarea id="mBody">問題描述：
+
+裝置：
+App 版本：
+發生時間：</textarea>
+    </div>
+    <div class="row">
+      <button class="preset" data-set="mTo" data-val="">to 留空測 INVALID_PARAM</button>
+      <button class="preset" data-set="mTo" data-val="not-an-email">格式錯誤</button>
+      <button class="preset" data-set="mTo" data-val="mymoji_support@taiwanmobile.com">還原</button>
+    </div>
+    <div class="row">
+      <button class="fire" id="fireMail">開啟郵件</button>
+    </div>
+    <div class="note">
+      <b>人工檢核（5.6）</b><br>
+      裝置未設定郵件帳號時，App 應提示並顯示客服信箱供複製。<br>
+      to 留空或格式錯誤時，App 應<b>不提示</b>、只記 log。<br>
+      有開起來的話，確認中文主旨與換行沒有變亂碼或被吃掉。
+      <div class="row">
+        <button class="verify y" data-verify="openEmail｜App 有出現提示">App 有跳提示</button>
+        <button class="verify n" data-verify="openEmail｜App 完全沒反應">App 沒反應</button>
+        <button class="verify" data-verify="openEmail｜郵件畫面已開啟，欄位正確">郵件正常開啟</button>
+        <button class="verify n" data-verify="openEmail｜郵件有開但欄位有誤（亂碼/缺漏）">欄位有誤</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>回呼監看<span class="kind cb">downloadFile 專用</span></h2>
+    <p class="why">規格第六章。原生用 evaluateJavascript 呼叫 window._onNativeCallback，靠 callbackId 配回原本那次下載。</p>
+
+    <div class="field">
+      <label>等待回呼中（逾時 60 秒）</label>
+      <div id="pendingList" class="pending-empty">目前沒有等待中的下載</div>
+    </div>
+
+    <div class="field">
+      <label for="cbJson">手動觸發（原生還沒接上時，用這裡驗 web 端接收邏輯）</label>
+      <textarea id="cbJson" rows="8"></textarea>
+    </div>
+    <div class="row">
+      <button class="preset" id="cbOk">成功</button>
+      <button class="preset" id="cbPerm">PERMISSION_DENIED</button>
+      <button class="preset" id="cbSave">SAVE_FAILED</button>
+      <button class="preset" id="cbOrphan">無主 callbackId</button>
+      <button class="preset" id="cbCopyNative">複製原生片段</button>
+    </div>
+    <div class="row">
+      <button class="fire" id="cbFire">觸發回呼</button>
+    </div>
+    <div class="note">範例會自動帶入目前等待中的 callbackId。填不存在的 id 會被記成無主 callback、不做模糊配對，這就是 6.6 的驗證方式。</div>
+  </section>
+
+  <section>
+    <h2>WebView 設定<span class="kind ff">非 Bridge</span></h2>
+    <p class="why">規格第七章，問題 1、2。與 Bridge 無關，但同一支 App 一起驗。</p>
+    <div class="field">
+      <label>影片全螢幕（iOS：allowsInlineMediaPlayback + playsinline）</label>
+      <video id="vid" controls playsinline webkit-playsinline preload="metadata"
+        src="https://storage.googleapis.com/gvabox/media/samples/stock.mp4"></video>
+      <div class="row">
+        <button class="preset" id="goFull">要求全螢幕</button>
+        <button class="preset" id="playVid">播放</button>
+      </div>
+    </div>
+    <div class="field" style="margin-top:16px">
+      <label>選擇照片（Android：WebChromeClient.onShowFileChooser）</label>
+      <label class="pick" for="photo">點這裡開啟相簿或相機
+        <input type="file" id="photo" accept="image/*">
+      </label>
+      <div id="pickResult"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="loghead">
+      <h2 style="margin:0">通訊紀錄</h2>
+      <div class="row" style="margin:0">
+        <button class="preset" id="copyLog">複製</button>
+        <button class="preset" id="clearLog">清除</button>
+      </div>
+    </div>
+    <div id="log"><div class="empty">還沒有任何呼叫。</div></div>
+  </section>
+
+  <footer>AppFunc 測試台 · 依 TWM App × MyMoji Web Bridge 技術規格書 v1.4</footer>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var DOWNLOAD_TIMEOUT = 60000;
+  var METHODS = ['openExternalLink', 'downloadFile', 'openEmail'];
+
+  /* ---------------- log ---------------- */
+  var logEl = document.getElementById('log');
+  var lines = [];
+  function stamp() {
+    var d = new Date();
+    function p(n, w) { return String(n).padStart(w || 2, '0'); }
+    return p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds()) + '.' + p(d.getMilliseconds(), 3);
+  }
+  function log(kind, title, payload) {
+    var t = stamp();
+    var body = payload === undefined ? '' : (typeof payload === 'string' ? payload : JSON.stringify(payload, null, 2));
+    lines.push('[' + t + '] ' + title + (body ? '\n' + body : ''));
+    var empty = logEl.querySelector('.empty');
+    if (empty) empty.remove();
+    var e = document.createElement('div');
+    e.className = 'entry ' + kind;
+    var h = document.createElement('div');
+    h.className = 'head';
+    var st = document.createElement('strong'); st.textContent = title;
+    var sp = document.createElement('span'); sp.textContent = t;
+    h.appendChild(st); h.appendChild(sp);
+    e.appendChild(h);
+    if (body) { var pre = document.createElement('pre'); pre.textContent = body; e.appendChild(pre); }
+    logEl.appendChild(e);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  /* ---------------- toast（模擬 App 原生提示用） ---------------- */
+  var toastEl = document.getElementById('toast'), toastTimer;
+  function fakeNativeToast(msg) {
+    toastEl.innerHTML = '';
+    var b = document.createElement('b'); b.textContent = '（模擬）App 原生提示';
+    var s = document.createElement('span'); s.textContent = msg;
+    toastEl.appendChild(b); toastEl.appendChild(s);
+    toastEl.style.display = 'block';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.style.display = 'none'; }, 3200);
+  }
+
+  /* ---------------- 模擬 AppFunc ---------------- */
+  var mock = false;
+  var realAppFunc = window.AppFunc || null;
+
+  var mockAppFunc = {
+    openExternalLink: function (url) {
+      log('sys', '[模擬原生] 收到 openExternalLink', { url: url });
+      if (/^(javascript|file|data):/i.test(url)) {
+        log('sys', '[模擬原生] scheme 不合法 → 靜默忽略，僅記 log（5.6）');
+        return;
+      }
+      if (!/^https:\/\//i.test(url) && /not-installed/.test(url)) {
+        fakeNativeToast('無法開啟此連結'); return;
+      }
+      fakeNativeToast('已交給系統開啟：' + url);
+    },
+    openEmail: function (to, subject, body) {
+      log('sys', '[模擬原生] 收到 openEmail', { to: to, subject: subject, bodyLength: (body || '').length });
+      if (!to || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to)) {
+        log('sys', '[模擬原生] to 不合法 → 不提示使用者，僅記 log（5.6）');
+        return;
+      }
+      fakeNativeToast('已開啟郵件編輯畫面');
+    },
+    downloadFile: function (url, filename, callbackId) {
+      log('sys', '[模擬原生] 收到 downloadFile', { url: url, filename: filename, callbackId: callbackId });
+      setTimeout(function () {
+        var r;
+        if (!/^https:\/\//i.test(url)) r = { success: false, data: { code: 'INVALID_PARAM', message: 'url must be https' } };
+        else if (/not-exist/.test(url))  r = { success: false, data: { code: 'DOWNLOAD_FAILED', message: 'HTTP 404' } };
+        else r = { success: true, data: { saved: true, path: '/mock/DCIM/MyMoji/' + filename, filename: filename } };
+        window._onNativeCallback({ callbackId: callbackId, success: r.success, data: r.data });
+      }, 900 + Math.random() * 900);
+    }
+  };
+
+  function appFunc() { return mock ? mockAppFunc : window.AppFunc; }
+  function has(m) { var o = appFunc(); return !!(o && typeof o[m] === 'function'); }
+
+  /* ---------------- 狀態盤 ---------------- */
+  function paint() {
+    var present = METHODS.filter(has);
+    var v = document.getElementById('verdict');
+    var via = document.getElementById('via');
+
+    if (mock) { v.textContent = '模擬中'; v.className = 'on'; via.textContent = '假的 AppFunc，非真實原生'; }
+    else if (!window.AppFunc) { v.textContent = '未注入'; v.className = ''; via.textContent = '找不到 window.AppFunc'; }
+    else if (present.length === METHODS.length) {
+      v.textContent = '全部就緒'; v.className = 'on';
+      via.textContent = METHODS.length + ' / ' + METHODS.length + ' 方法可用';
+    } else {
+      v.textContent = '部分可用'; v.className = 'on';
+      via.textContent = present.length + ' / ' + METHODS.length + ' 方法可用，App 版本可能較舊';
+    }
+
+    METHODS.forEach(function (name, i) {
+      var td = document.getElementById('m' + (i + 1));
+      var ok = has(name);
+      td.textContent = ok ? '✓' : '✗';
+      td.className = ok ? 'yes' : 'no';
+    });
+
+    document.getElementById('fHost').textContent = location.host || '（本機檔案）';
+    var o = appFunc();
+    var all = [];
+    if (o) { for (var k in o) { if (typeof o[k] === 'function') all.push(k); } }
+    document.getElementById('fAll').textContent = all.length ? all.join(', ') : '—';
+    document.getElementById('fUA').textContent = navigator.userAgent;
+  }
+
+  /* ---------------- downloadFile（唯一有回呼） ---------------- */
+  var pending = {};
+  function newId() { return 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8); }
+
+  window._onNativeCallback = function (r) {
+    if (typeof r === 'string') { try { r = JSON.parse(r); } catch (e) {} }
+    if (!r || typeof r !== 'object') { log('err', '回呼格式錯誤', String(r)); return; }
+
+    var p = pending[r.callbackId];
+    if (!p) {
+      log('sys', '收到無主 callback', {
+        received: r,
+        reason: r.callbackId ? 'callbackId 不在等待清單中：逾時後才回、重複回呼、或偽造' : '沒有帶 callbackId'
+      });
+      return;
+    }
+    delete pending[r.callbackId];
+    clearTimeout(p.timer);
+    renderPending();
+    var ms = Date.now() - p.t0;
+
+    if (r.success === true) {
+      log('ok', '← downloadFile 成功 ' + ms + 'ms', r.data);
+      p.resolve(r.data || {});
+    } else {
+      var d = r.data || { code: 'UNKNOWN', message: 'native returned success=false without data' };
+      log('err', '← downloadFile 失敗 ' + ms + 'ms', d);
+      p.reject(d);
+    }
+  };
+
+  function downloadFile(url, filename) {
+    return new Promise(function (resolve, reject) {
+      if (!has('downloadFile')) {
+        var e = { code: 'BRIDGE_UNAVAILABLE', message: 'AppFunc.downloadFile 未定義' };
+        log('err', '← downloadFile 無法呼叫', e);
+        reject(e); return;
+      }
+      var id = newId();
+      log('out', '→ downloadFile', { url: url, filename: filename, callbackId: id });
+
+      pending[id] = {
+        resolve: resolve, reject: reject, t0: Date.now(), filename: filename,
+        timer: setTimeout(function () {
+          delete pending[id]; renderPending();
+          var err = { code: 'TIMEOUT', message: 'downloadFile 逾時未回呼（60 秒）', callbackId: id };
+          log('err', '← downloadFile 逾時', err);
+          reject(err);
+        }, DOWNLOAD_TIMEOUT)
+      };
+      renderPending();
+
+      try {
+        appFunc().downloadFile(url, filename, id);
+      } catch (e2) {
+        clearTimeout(pending[id].timer); delete pending[id]; renderPending();
+        var err2 = { code: 'BRIDGE_UNAVAILABLE', message: String(e2) };
+        log('err', '← downloadFile 呼叫例外', err2);
+        reject(err2);
+      }
+    });
+  }
+
+  function renderPending() {
+    var box = document.getElementById('pendingList');
+    var ids = Object.keys(pending);
+    if (!ids.length) { box.className = 'pending-empty'; box.textContent = '目前沒有等待中的下載'; return; }
+    box.className = ''; box.innerHTML = '';
+    ids.forEach(function (id) {
+      var p = pending[id];
+      var d = document.createElement('div'); d.className = 'pending-item';
+      var b = document.createElement('b'); b.textContent = p.filename || 'downloadFile';
+      var s = document.createElement('span'); s.textContent = id;
+      var e = document.createElement('em'); e.textContent = Math.round((Date.now() - p.t0) / 1000) + 's';
+      d.appendChild(b); d.appendChild(s); d.appendChild(e);
+      box.appendChild(d);
+    });
+  }
+  setInterval(function () { if (Object.keys(pending).length) renderPending(); }, 1000);
+
+  function lastPendingId() {
+    var ids = Object.keys(pending);
+    return ids.length ? ids[ids.length - 1] : 'cb_1234567890_ab12cd';
+  }
+
+  /* ---------------- 無回呼三兄弟 ---------------- */
+  function fireAndForget(method, args) {
+    log('out', '→ ' + method + '（無回呼）', args.reduce(function (o, v, i) {
+      o['arg' + i] = typeof v === 'string' && v.length > 120 ? v.slice(0, 120) + '…' : v; return o;
+    }, {}));
+    if (!has(method)) {
+      log('err', '← ' + method + ' 無法呼叫', { code: 'BRIDGE_UNAVAILABLE', message: 'AppFunc.' + method + ' 未定義' });
+      return false;
+    }
+    try { appFunc()[method].apply(appFunc(), args); }
+    catch (e) { log('err', '← ' + method + ' 呼叫例外', { code: 'BRIDGE_UNAVAILABLE', message: String(e) }); return false; }
+    log('sys', '  ' + method + ' 已送出，web 端到此為止 —— 結果請看 App 本身有無提示');
+    return true;
+  }
+
+  /* ---------------- 綁定 ---------------- */
+  function val(id) { return document.getElementById(id).value; }
+
+  document.querySelectorAll('.preset[data-set]').forEach(function (b) {
+    b.addEventListener('click', function () { document.getElementById(b.dataset.set).value = b.dataset.val; });
+  });
+
+  document.getElementById('fireExt').addEventListener('click', function () {
+    fireAndForget('openExternalLink', [val('extUrl').trim()]);
+  });
+
+  document.getElementById('fireMail').addEventListener('click', function () {
+    fireAndForget('openEmail', [val('mTo').trim(), val('mSub'), val('mBody')]);
+  });
+
+  var dlBtn = document.getElementById('fireDl');
+  dlBtn.addEventListener('click', function () {
+    dlBtn.disabled = true;
+    downloadFile(val('dlUrl').trim(), val('dlName').trim())
+      .catch(function () {})
+      .then(function () { dlBtn.disabled = false; });
+  });
+
+  document.getElementById('fireDl2').addEventListener('click', function () {
+    var url = val('dlUrl').trim(), base = val('dlName').trim().replace(/\.mp4$/i, '');
+    log('sys', '同時送出兩筆下載，驗證兩個 callbackId 各自配對、不互相覆蓋');
+    downloadFile(url, base + '_A.mp4').catch(function () {});
+    setTimeout(function () { downloadFile(url, base + '_B.mp4').catch(function () {}); }, 120);
+  });
+
+  document.querySelectorAll('.verify').forEach(function (b) {
+    b.addEventListener('click', function () { log('human', '人工檢核：' + b.dataset.verify); });
+  });
+
+  document.getElementById('mockChk').addEventListener('change', function (e) {
+    mock = e.target.checked;
+    log('sys', mock ? '切換為模擬模式（假 AppFunc）' : '切換為真實 AppFunc');
+    paint();
+  });
+
+  /* ---------------- 回呼手動觸發 ---------------- */
+  var cbJson = document.getElementById('cbJson');
+  function fill(obj) { cbJson.value = JSON.stringify(obj, null, 2); }
+
+  document.getElementById('cbOk').addEventListener('click', function () {
+    var id = lastPendingId(), p = pending[id];
+    fill({ callbackId: id, success: true,
+      data: { saved: true, path: '/storage/emulated/0/DCIM/MyMoji/' + ((p && p.filename) || 'test.mp4'),
+              filename: (p && p.filename) || 'test.mp4' } });
+  });
+  document.getElementById('cbPerm').addEventListener('click', function () {
+    fill({ callbackId: lastPendingId(), success: false,
+      data: { code: 'PERMISSION_DENIED', message: 'user denied photo library access',
+              nativeError: 'PHAuthorizationStatus.denied' } });
+  });
+  document.getElementById('cbSave').addEventListener('click', function () {
+    fill({ callbackId: lastPendingId(), success: false,
+      data: { code: 'SAVE_FAILED', message: 'insufficient storage', nativeError: 'ENOSPC' } });
+  });
+  document.getElementById('cbOrphan').addEventListener('click', function () {
+    fill({ callbackId: 'cb_does_not_exist_9999', success: true, data: { saved: true, path: '/fake' } });
+  });
+
+  document.getElementById('cbFire').addEventListener('click', function () {
+    var raw = cbJson.value.trim(), parsed;
+    try { parsed = JSON.parse(raw); }
+    catch (e) { log('err', 'callback JSON 解析失敗', { input: raw, message: String(e.message || e) }); return; }
+    log('sys', '手動觸發 _onNativeCallback', parsed);
+    try { window._onNativeCallback(parsed); }
+    catch (e) { log('err', '_onNativeCallback 執行例外', String(e)); }
+  });
+
+  document.getElementById('cbCopyNative').addEventListener('click', function () {
+    var payload = cbJson.value.trim() || '{}', oneline;
+    try { oneline = JSON.stringify(JSON.parse(payload)); } catch (e) { oneline = payload; }
+    copyText(
+      '// Android（須 webView.post 切回 UI thread）\n' +
+      'val payload = gson.toJson(result)   // 必須序列化，禁止字串拼接\n' +
+      'webView.post {\n' +
+      '    webView.evaluateJavascript("window._onNativeCallback($payload)", null)\n' +
+      '}\n\n' +
+      '// iOS（須 DispatchQueue.main.async）\n' +
+      'let payload = String(data: try JSONEncoder().encode(result), encoding: .utf8)!\n' +
+      'DispatchQueue.main.async {\n' +
+      '    webView.evaluateJavaScript("window._onNativeCallback(\\(payload))")\n' +
+      '}\n\n' +
+      '// 本次 payload：\n' + oneline + '\n\n' +
+      '// 注意：message 可能含使用者輸入的檔名，字串拼接會造成 JS injection（規格 6.1）',
+      '原生片段已複製');
+  });
+
+  /* ---------------- WebView 設定 ---------------- */
+  var vid = document.getElementById('vid');
+  document.getElementById('playVid').addEventListener('click', function () {
+    vid.play().then(function () { log('sys', '影片開始播放（inline）'); })
+      .catch(function (e) { log('err', '影片播放被拒', String(e)); });
+  });
+  document.getElementById('goFull').addEventListener('click', function () {
+    if (vid.webkitEnterFullscreen) { vid.webkitEnterFullscreen(); log('sys', '呼叫 webkitEnterFullscreen（iOS）'); }
+    else if (vid.requestFullscreen) {
+      vid.requestFullscreen().then(function () { log('sys', '進入全螢幕'); })
+        .catch(function (e) { log('err', '全螢幕失敗', String(e)); });
+    } else log('err', '此 WebView 不支援全螢幕 API');
+  });
+
+  document.getElementById('photo').addEventListener('change', function (e) {
+    var f = e.target.files && e.target.files[0];
+    var box = document.getElementById('pickResult');
+    if (!f) { log('err', '檔案選擇器沒有回傳檔案'); return; }
+    box.style.display = 'block'; box.innerHTML = '';
+    var img = document.createElement('img'); img.src = URL.createObjectURL(f); img.alt = f.name;
+    var p = document.createElement('p');
+    p.textContent = f.name + ' · ' + f.type + ' · ' + Math.round(f.size / 1024) + ' KB';
+    box.appendChild(img); box.appendChild(p);
+    log('ok', '照片選擇成功', { name: f.name, type: f.type, sizeKB: Math.round(f.size / 1024) });
+  });
+
+  /* ---------------- log 工具 ---------------- */
+  document.getElementById('clearLog').addEventListener('click', function () {
+    lines = []; logEl.innerHTML = '<div class="empty">紀錄已清除。</div>';
+  });
+  document.getElementById('copyLog').addEventListener('click', function () {
+    copyText(lines.join('\n\n') || '(空)', '紀錄已複製到剪貼簿');
+  });
+  function copyText(text, okMsg) {
+    var done = function () { log('sys', okMsg); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text, done); });
+    } else fallbackCopy(text, done);
+  }
+  function fallbackCopy(text, done) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { log('err', '複製失敗，請手動選取'); }
+    ta.remove();
+  }
+
+  /* ---------------- 啟動 ---------------- */
+  paint();
+  renderPending();
+  document.getElementById('cbOk').click();
+  log('sys', '測試台就緒（規格 v1.4）', {
+    host: location.host,
+    AppFunc: !!window.AppFunc,
+    可用方法: METHODS.filter(function (m) { return !!(window.AppFunc && typeof window.AppFunc[m] === 'function'); })
+  });
+
+  if (!window.AppFunc) {
+    document.getElementById('mockChk').checked = true;
+    mock = true;
+    log('sys', '找不到 window.AppFunc，已自動開啟模擬模式');
+    paint();
+  }
+
+  var tries = 0;
+  var t = setInterval(function () {
+    tries += 1;
+    if ((window.AppFunc && window.AppFunc !== realAppFunc) || tries > 20) { clearInterval(t); paint(); }
+  }, 100);
+})();
+</script>
+</body>
+</html>
